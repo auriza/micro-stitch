@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Auriza Akbar" />
+  <meta name="dcterms.date" content="2019-01-01" />
+  <title>Penyambungan Otomatis Citra Mikroskop</title>
+  <style>
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style>
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="water.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Penyambungan Otomatis Citra Mikroskop</h1>
+<p class="author">Auriza Akbar</p>
+<p class="date">2019</p>
+</header>
+<h1 id="penyambungan-otomatis-citra-mikroskop">Penyambungan Otomatis Citra Mikroskop</h1>
+<h2 id="algoritme">Algoritme</h2>
+<p>Untuk menyambungkan beberapa citra, diperlukan algoritme pengolahan citra berikut (Brown dan Lowe 2007)<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>:</p>
+<ol type="1">
+<li>ekstraksi ciri dengan <em>scale-invariant feature transform</em> (SIFT)</li>
+<li>estimasi homografi atau transformasi <em>affine</em> dengan <em>random sample consensus</em> (Ransac)</li>
+<li>optimisasi sambungan antar-citra dengan <em>bundle adjustment</em> dan <em>blending</em></li>
+</ol>
+<p>Salah satu implementasi algoritme ini adalah OpenPano yang ditulis oleh Wu (2019)<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
+<h2 id="kompilasi-openpano">Kompilasi OpenPano</h2>
+<p>Kode sumber OpenPano ditulis dengan bahasa C++ dari dasar. Sebelum bisa menjalankannya, kode sumber tersebut harus dikompilasi terlebih dahulu. Berikut perintah kompilasinya pada Ubuntu Linux 18.04.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># instal dependensi</span></a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="fu">sudo</span> apt install cmake libeigen3-dev</a>
+<a class="sourceLine" id="cb1-3" title="3"></a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="co"># unduh dan ekstrak</span></a>
+<a class="sourceLine" id="cb1-5" title="5"><span class="fu">wget</span> https://github.com/ppwwyyxx/OpenPano/archive/master.zip</a>
+<a class="sourceLine" id="cb1-6" title="6"><span class="fu">unzip</span> master.zip</a>
+<a class="sourceLine" id="cb1-7" title="7"></a>
+<a class="sourceLine" id="cb1-8" title="8"><span class="co"># kompilasi</span></a>
+<a class="sourceLine" id="cb1-9" title="9"><span class="fu">make</span> -C OpenPano-master/src</a>
+<a class="sourceLine" id="cb1-10" title="10"></a>
+<a class="sourceLine" id="cb1-11" title="11"><span class="co"># salin hasilnya ke direktori /usr/local</span></a>
+<a class="sourceLine" id="cb1-12" title="12"><span class="fu">sudo</span> cp OpenPano-master/src/image-stitching /usr/local/bin</a>
+<a class="sourceLine" id="cb1-13" title="13"><span class="fu">sudo</span> cp OpenPano-master/src/config.cfg      /usr/local/etc</a></code></pre></div>
+<p>Setelah kompilasi berhasil, akan didapatkan program baru dengan nama <code>image-stitching</code>. <em>File</em> konfigurasi <code>config.cfg</code> harus disalin ke direktori kerja sebelum menjalankan program.</p>
+<h2 id="konfigurasi-openpano">Konfigurasi OpenPano</h2>
+<p>OpenPano memiliki pilihan tiga mode penyambungan dengan syaratnya:</p>
+<ul>
+<li>silinder: tidak ada perpindahan pada kamera, citra diambil dari kiri ke kanan dan harus terurut</li>
+<li>estimasi: tidak ada perpindahan pada kamera, citra tidak terurut namun lebih lambat</li>
+<li>translasi: kamera hanya melakukan perpindahan dengan kedalaman citra sama, citra harus terurut</li>
+</ul>
+<p>Mode <em>default</em> OpenPano adalah estimasi. Namun, untuk kasus penyambungan citra mikroskop, lebih tepat digunakan mode translasi. Hal ini karena citra mikroskop diambil dengan cara menggeser-geser objek. Berikut perubahan konfigurasi pada <em>file</em> <code>config.cfg</code> untuk beralih ke mode translasi.</p>
+<pre><code>CYLINDER            0
+ESTIMATE_CAMERA     0
+TRANS               1
+ORDERED_INPUT       1</code></pre>
+<h2 id="menjalankan-openpano">Menjalankan OpenPano</h2>
+<p>Syarat citra masukan:</p>
+<ul>
+<li>format PNG atau JPEG</li>
+<li>terurut secara bersambung (mengular)</li>
+<li>beririsan ciri minimal 10%</li>
+</ul>
+<p>Citra harus diberikan nama <em>file</em> yang menggambarkan urutannya. Berikut adalah contoh urutan citra yang benar.</p>
+<figure>
+<img src="order.png" alt="Urutan citra terurut secara mengular" /><figcaption>Urutan citra terurut secara mengular</figcaption>
+</figure>
+<p>Sebelum menjalankan program, <em>file</em> konfigurasi <code>config.cfg</code> harus disalin dahulu ke direktori kerja. Kemudian, penyambungan citra dilakukan dengan memanggil program <code>image-stitching</code> dengan parameter semua nama citra yang akan disambung. Untuk dapat tersambung dengan baik, antara kedua citra harus beririsan ciri minimal 10%. Setelah berhasil, akan dihasilkan citra keluaran dengan nama <em>file</em> <code>out.jpg</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="fu">cp</span> /usr/local/etc/config.cfg .</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="ex">image-stitching</span> *.png</a></code></pre></div>
+<p>Berikut contoh citra masukan T1 yang terdiri atas 44 citra dan hasil keluarannya dengan menggunakan konfigurasi mode translasi. Tiap citra masukan berdimensi 1280×960 piksel. Citra keluaran berdimensi 5118×3879 piksel. Proses penyambungan citra mode translasi membutuhkan waktu CPU sebesar 1.4 menit pada prosesor Intel Core i7-4770 3.40 GHz.</p>
+<figure>
+<img src="input.jpg" alt="Citra masukan T1 sebanyak 44 buah" /><figcaption>Citra masukan T1 sebanyak 44 buah</figcaption>
+</figure>
+<figure>
+<img src="est-tra.jpg" alt="Citra keluaran T1 mode estimasi (kiri) dan translasi (kanan)" /><figcaption>Citra keluaran T1 mode estimasi (kiri) dan translasi (kanan)</figcaption>
+</figure>
+<p>Percobaan pada mode estimasi memerlukan waktu CPU yang lebih lama sebesar 9.5 menit. Meskipun hasil sambungannya relatif lebih bagus, namun waktu yang sangat lama membuat mode estimasi tidak praktis untuk jumlah citra masukan yang banyak. Mode estimasi tidak mensyaratkan citra harus terurut, akibatnya kompleksitas menjadi kuadratik karena harus melakukan <em>pairwise matching</em> pada tiap citra masukan. Selain itu, mode estimasi akan mendistorsi citra hasil seperti bentuk lensa. Hal ini terlihat dari bentuk citra yang melengkung terutama pada bagian pinggir, sehingga tidak lurus lagi seperti yang diharapkan.</p>
+<h2 id="blending-vertikal"><em>Blending</em> Vertikal</h2>
+<p>Pada citra hasil mode translasi terlihat garis-garis mendatar pada sambungan antar-citra. Hal ini karena tujuan awal OpenPano adalah untuk menyambungkan citra panorama dari kiri ke kanan secara horizontal, bukan dari atas ke bawah. Oleh karena itu, diperlukan penambahan <em>blending</em> secara vertikal pada mode translasi dengan cara menghapus kode program baris ke-34 pada <em>file</em> <code>src/stitch/blender.cc</code> seperti di bawah ini. Setelah itu kode program OpenPano dikompilasi ulang.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode diff"><code class="sourceCode diff"><a class="sourceLine" id="cb4-1" title="1"><span class="dt">@@ -32,5 +32,4 @@</span></a>
+<a class="sourceLine" id="cb4-2" title="2">    if (color.x &lt; 0) continue; \</a>
+<a class="sourceLine" id="cb4-3" title="3">    float   w = 0.5 - fabs(c / img.imgref.width() - 0.5); \</a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="st">-   if (not config::ORDERED_INPUT) /* blend both direction */\</span></a>
+<a class="sourceLine" id="cb4-5" title="5">        w *= (0.5 - fabs(r / img.imgref.height() - 0.5)); \</a>
+<a class="sourceLine" id="cb4-6" title="6">    color *= w</a></code></pre></div>
+<p>Berikut adalah hasil mode translasi dengan penambahan <em>blending</em> vertikal. Garis mendatar pada hasil sebelumnya sudah hilang, sehingga kualitasnya sama dengan mode estimasi. Waktu CPU yang dibutuhkan pun relatif sama dengan metode translasi biasa.</p>
+<figure>
+<img src="out-trv.jpg" alt="Citra keluaran T1 mode translasi dengan blending vertikal" /><figcaption>Citra keluaran T1 mode translasi dengan <em>blending</em> vertikal</figcaption>
+</figure>
+<h2 id="kegagalan-penyambungan">Kegagalan Penyambungan</h2>
+<p>Pada contoh di atas, program berjalan dengan sukses karena semua citra berhasil disambungkan. Namun, pada banyak kasus terdapat citra yang gagal disambungkan dengan citra sebelumnya. Berikut contoh pesan kesalahan program jika menemukan kasus kegagalan tersebut.</p>
+<pre><code>error: Image 7 and 8 don&#39;t match</code></pre>
+<p>Sayangnya jika terjadi kegagalan, program akan langsung keluar tanpa melakukan langkah lebih lanjut. Citra yang dihapus biasanya memiliki fitur yang sedikit, sehingga tidak bisa disambungkan dengan citra berikutnya. Oleh karena itu, diperlukan metode tambahan untuk melanjutkan proses penyambungan jika terjadi kegagalan.</p>
+<p>Metode pertama sederhana, misalnya jika terdapat kegagalan penyambungan antara citra 7 dan 8, maka hapus citra nomor 8 dan jalankan kembali penyambungan dari awal. Demikian seterusnya sampai menyisakan kumpulan citra yang berhasil tersambung semuanya. Namun biasanya setelah citra 8 dihapus, citra 7 dan 9 akan gagal juga disambungkan, sehingga kegagalan akan berlanjut sampai akhir.</p>
+<p>Untuk mengatasinya, diperlukan metode baru dalam mengatasi kegagalan penyambungan. Metode kedua akan menghapus dengan mempertimbangkan nomor citra yang sudah dihapus sebelumnya. Misalnya citra 7 dan 8 gagal disambungkan, maka citra nomor 8 dihapus seperti biasa. Selanjutnya jika citra 7 dan 9 gagal disambungkan, maka citra nomor 7 yang akan dihapus, karena nomornya sama dengan nomor citra yang gagal sebelumnya. Dengan metode ini, jumlah citra yang dihapus menurun sehingga hasil akhirnya lebih bagus. Berikut ilustrasi proses kedua metode tersebut.</p>
+<figure>
+<img src="method.gif" alt="Penghapusan citra yang gagal disambungkan dengan metode pertama (kiri) dan kedua (kanan)" /><figcaption>Penghapusan citra yang gagal disambungkan dengan metode pertama (kiri) dan kedua (kanan)</figcaption>
+</figure>
+<p>Perbandingan jumlah citra yang dihapus pada kedua metode dapat dilihat pada tabel berikut. Terdapat 5 set citra yang akan disambungkan, dapat dilihat bahwa metode kedua lebih baik dalam menangani kegagalan penyambungan. Contohnya dapat dilihat pada hasil penyambungan citra T5 berikut ini.</p>
+<table>
+<caption>Perbandingan jumlah citra yang dihapus karena gagal disambung</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Citra</th>
+<th style="text-align: center;">Jumlah masukan</th>
+<th style="text-align: center;">Metode 1</th>
+<th style="text-align: center;">Metode 2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">T1</td>
+<td style="text-align: center;">44</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T2</td>
+<td style="text-align: center;">45</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T3</td>
+<td style="text-align: center;">42</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T4</td>
+<td style="text-align: center;">42</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T5</td>
+<td style="text-align: center;">48</td>
+<td style="text-align: center;">13</td>
+<td style="text-align: center;">4</td>
+</tr>
+</tbody>
+</table>
+<figure>
+<img src="method-t5.jpg" alt="Citra keluaran T5 dengan metode pertama (kiri) dan kedua (kanan)" /><figcaption>Citra keluaran T5 dengan metode pertama (kiri) dan kedua (kanan)</figcaption>
+</figure>
+<p>Berikut adalah implementasi metode kedua dengan menggunakan <em>shell script</em>. Program <code>image-stitching</code> akan dijalankan terus menerus hingga tidak ada lagi pesan kesalahan.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="fu">remove_unmatch ()</span> <span class="kw">{</span></a>
+<a class="sourceLine" id="cb6-2" title="2">    <span class="va">img_num=$(</span><span class="fu">grep</span> error err.log <span class="kw">|</span> <span class="fu">sed</span> -E <span class="st">&#39;s/.* ([0-9]+).*/\1/&#39;</span><span class="va">)</span>    <span class="co"># get unmatch image number</span></a>
+<a class="sourceLine" id="cb6-3" title="3"></a>
+<a class="sourceLine" id="cb6-4" title="4">    <span class="kw">if</span><span class="bu"> [</span> <span class="va">$img_num</span> <span class="ot">=</span> <span class="va">$prev_unmatch</span><span class="bu"> ]</span>; <span class="kw">then</span>                           <span class="co"># if same as previous unmatch:</span></a>
+<a class="sourceLine" id="cb6-5" title="5">        <span class="va">img_num=$((</span>img_num-1<span class="va">))</span>                                      <span class="co">#   select the image before unmatch</span></a>
+<a class="sourceLine" id="cb6-6" title="6">    <span class="kw">else</span></a>
+<a class="sourceLine" id="cb6-7" title="7">        <span class="va">prev_unmatch=$img_num</span></a>
+<a class="sourceLine" id="cb6-8" title="8">    <span class="kw">fi</span></a>
+<a class="sourceLine" id="cb6-9" title="9"></a>
+<a class="sourceLine" id="cb6-10" title="10">    <span class="va">img_file=$(</span><span class="fu">ls</span> *.png <span class="kw">|</span> <span class="fu">head</span> -n <span class="va">$((</span>img_num+1<span class="va">))</span> <span class="kw">|</span> <span class="fu">tail</span> -n 1<span class="va">)</span>       <span class="co"># get its filename</span></a>
+<a class="sourceLine" id="cb6-11" title="11">    <span class="fu">mv</span> <span class="va">$img_file</span> <span class="va">$img_file</span>.rem                                      <span class="co"># remove it</span></a>
+<a class="sourceLine" id="cb6-12" title="12"><span class="kw">}</span></a>
+<a class="sourceLine" id="cb6-13" title="13"></a>
+<a class="sourceLine" id="cb6-14" title="14"><span class="fu">cp</span> /usr/local/etc/config.cfg .</a>
+<a class="sourceLine" id="cb6-15" title="15"><span class="va">prev_unmatch=</span>1</a>
+<a class="sourceLine" id="cb6-16" title="16"><span class="kw">until</span> <span class="ex">image-stitching</span> *.png <span class="op">2&gt;</span> err.log<span class="kw">;</span> <span class="kw">do</span></a>
+<a class="sourceLine" id="cb6-17" title="17">    <span class="ex">remove_unmatch</span></a>
+<a class="sourceLine" id="cb6-18" title="18"><span class="kw">done</span></a></code></pre></div>
+<h2 id="multiband-blending"><em>Multiband Blending</em></h2>
+<p>Meskipun berhasil disambungkan, namun detail citra yang dihasilkan masih ada yang samar di beberapa titik. Untuk memperoleh detail yang tajam, dapat digunakan fitur <em>multiband blending</em>. Fitur ini diaktifkan dengan mengatur konfigurasi <code>MULTIBAND</code> dengan nilai <em>band</em> yang diinginkan. Semakin besar jumlah <em>band</em>, semakin halus hasil sambungannya, namun akan menambah waktu CPU. Berikut contoh perbedaan detail antara mode translasi biasa dan mode translasi dengan 2-<em>band blending</em>.</p>
+<figure>
+<img src="detail.jpg" alt="Detail citra keluaran T1 tanpa (kiri) dan dengan 2-band blending (kanan)" /><figcaption>Detail citra keluaran T1 tanpa (kiri) dan dengan 2-<em>band blending</em> (kanan)</figcaption>
+</figure>
+<p>Namun, hasil akhir secara keseluruhan dengan fitur ini menjadi lebih buruk. Terlihat garis-garis pemisah antar-sambungan citra karena perbedaan kontras pada citra masukan. Garis-garis ini dapat disamarkan dengan menambah jumlah <em>band</em>, namun waktu pemrosesan menjadi lebih lama. Kualitas keluaran fitur ini akan lebih baik jika semua citra masukan memiliki pencahayaan atau kontras yang seragam. Berikut hasil citra keluaran secara keseluruhan dengan fitur <em>multiband blending</em> sejumlah 16 dan 128 <em>band</em>. Terlihat bahwa semakin banyak jumlah <em>band</em>, hasil keseluruhan semakin bagus.</p>
+<figure>
+<img src="mband-16-128.jpg" alt="Citra keluaran T1 dengan 16-band (kiri) dan 128-band (kanan) blending" /><figcaption>Citra keluaran T1 dengan 16-<em>band</em> (kiri) dan 128-<em>band</em> (kanan) <em>blending</em></figcaption>
+</figure>
+<p>Tabel berikut menunjukkan waktu yang dibutuhkan untuk pemrosesan <em>multiband blending</em> dari 0 hingga 128 <em>band</em> untuk citra T1. Dapat dilihat terjadi penambahan waktu CPU secara linear setiap penambahan jumlah <em>band</em>. Misalnya untuk 16-<em>band</em> dibutuhkan waktu CPU 3.7 menit atau waktu <em>real</em> 0.5 menit. Waktu <em>real</em> hampir 8 kali lebih cepat karena CPU Intel i7 yang digunakan memiliki 8 <em>thread</em>. Beban kerja CPU dibagi ke tiap <em>thread</em>, sehingga waktu <em>real</em>-nya lebih cepat. Untuk hasil yang bagus dengan 128-<em>band</em>, dibutuhkan waktu pemrosesan yang lama sekitar 30 menit waktu CPU.</p>
+<table>
+<caption>Perbandingan waktu pemrosesan <em>multiband blending</em> citra T1</caption>
+<thead>
+<tr class="header">
+<th style="text-align: center;"><em>Band</em></th>
+<th style="text-align: center;">Waktu CPU</th>
+<th style="text-align: center;">Waktu <em>real</em></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1:26</td>
+<td style="text-align: center;">0:12</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1:32</td>
+<td style="text-align: center;">0:13</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">1:39</td>
+<td style="text-align: center;">0:14</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">1:54</td>
+<td style="text-align: center;">0:16</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">2:28</td>
+<td style="text-align: center;">0:20</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">16</td>
+<td style="text-align: center;">3:41</td>
+<td style="text-align: center;">0:30</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">32</td>
+<td style="text-align: center;">6:47</td>
+<td style="text-align: center;">0:54</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">64</td>
+<td style="text-align: center;">13:36</td>
+<td style="text-align: center;">1:48</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">128</td>
+<td style="text-align: center;">29:39</td>
+<td style="text-align: center;">3:54</td>
+</tr>
+</tbody>
+</table>
+<h2 id="simpulan">Simpulan</h2>
+<p>Mode translasi dengan tambahan <em>blending</em> vertikal pada OpenPano berhasil menyambungkan citra mikroskop dengan baik. Apabila terjadi kegagalan, maka citra yang menyebabkan gagal akan dihapus dengan mempertimbangkan kegagalan sebelumnya, hingga citra dapat disambungkan semuanya. Detail hasil citra keluaran dapat dipertajam dengan fitur <em>multiband blending</em>, namun hasil akhirnya menjadi terfragmentasi. Fragmentasi dapat disamarkan dengan menambah jumlah <em>band</em>, namun akan memperlama proses penyambungan. Sebaiknya semua citra masukan memiliki pencahayaan dan kontras yang seragam agar tidak terjadi fragmentasi.</p>
+<figure>
+<img src="out.gif" alt="Simpulan: estimasi, translasi, blending vertikal, dan multiband" /><figcaption>Simpulan: estimasi, translasi, <em>blending</em> vertikal, dan <em>multiband</em></figcaption>
+</figure>
+<!--
+
+remove_unmatch1 () {
+    img_num=$(grep error err.log | sed -E 's/.* ([0-9]+).*/\1/')    # get unmatch image number
+    img_file=$(ls *.png | head -n $((img_num+1)) | tail -n 1)       # get its filename
+    mv $img_file $img_file.rem                                      # remove it
+}
+
+Jumlah error
+
+Citra   Metode 2                Metode 1                estimate
+------  ----------              ------------------      ---------
+1       0                       0                       0
+2       3: 38,37,39             2: 38,39                0
+3       2: 36,35                6: 36-41                0
+4       3: 5,4,6                2: 5,6                  1: 5
+5       4: 5,36,35,47           13: 5,36-47             2: 36,47
+
+
+Metode          Tilia1 (44)     Tilia2 (45)     Tilia3 (42)     Tilia4 (42)     Tilia5 (48)
+-------         -----------     ------------    ------------    ------------    -----------
+`ESTIMATE`      9:30 (2:02)     9:26 (2:18)     7:34 (2:06)     8:04 (2:35)#    8:11 (1:52)$
+`TRANSLATE`     1:26 (0:12)     1:25 (0:12)*    1:14 (0:11)+    1:15 (0:11)##   1:21 (0:11)$$
+`TRANSLATE-2`   1:39 (0:14)     1:37 (0:14)*    1:26 (0:12)+    1:26 (0:12)##   1:34 (0:13)$$
+
+                3:54 (1:14)
+                5:10 (1:50)
+
+*error: Image 37 and 38 don't match
++error: Image 35 and 36 don't match
+#error: Found a tree of size 41!=42, image 5  are not connected well!
+##error: Image 4 and 5 don't match
+$error: Found a tree of size 46!=48, image 36 47  are not connected well!
+$$error: Image 4 and 5 don't match
+
+Intel i7-4770 4C/8T @ 3.40 GHz; SSD
+
+| *Band* | Waktu CPU | Waktu *real* |
+| ------ | :-------: | :----------: |
+| 0      |   1:26    |     0:12     |
+| 1      |   1:32    |     0:13     |
+| 2      |   1:39    |     0:14     |
+| 4      |   1:54    |     0:16     |
+| 8      |   2:28    |     0:20     |
+| 16     |   3:41    |     0:30     |
+| 32     |   6:47    |     0:54     |
+| 64     |   13:36   |     1:48     |
+| 128    |   29:39   |     3:54     |
+
+
+<http://ppwwyyxx.com/2016/How-to-Write-a-Panorama-Stitcher/>
+-->
+<section class="footnotes" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1" role="doc-endnote"><p>Brown M, Lowe DG. 2007. Automatic panoramic image stitching using invariant features. <em>IJCV</em>. 74(1): 59–73.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a></p></li>
+<li id="fn2" role="doc-endnote"><p>Wu Y. 2019. OpenPano: automatic panorama stitching from scratch. Tersedia pada: <a href="https://github.com/ppwwyyxx/OpenPano" class="uri">https://github.com/ppwwyyxx/OpenPano</a>.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩</a></p></li>
+</ol>
+</section>
+</body>
+</html>
