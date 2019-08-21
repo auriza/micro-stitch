@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <meta name="author" content="Auriza Akbar" />
   <meta name="dcterms.date" content="2019-01-01" />
-  <title>Penyambungan Otomatis Citra Mikroskop</title>
+  <title>Automatic Microscope Images Stitching</title>
   <style>
       code{white-space: pre-wrap;}
       span.smallcaps{font-variant: small-caps;}
@@ -83,99 +83,99 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </head>
 <body>
 <header id="title-block-header">
-<h1 class="title">Penyambungan Otomatis Citra Mikroskop</h1>
+<h1 class="title">Automatic Microscope Images Stitching</h1>
 <p class="author">Auriza Akbar</p>
 <p class="date">2019</p>
 </header>
-<h1 id="penyambungan-otomatis-citra-mikroskop">Penyambungan Otomatis Citra Mikroskop</h1>
-<h2 id="algoritme">Algoritme</h2>
-<p>Untuk menyambungkan beberapa citra, diperlukan algoritme pengolahan citra berikut (Brown dan Lowe 2007)<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>:</p>
+<h1 id="automatic-microscope-images-stitching">Automatic Microscope Images Stitching</h1>
+<h2 id="algorithm">Algorithm</h2>
+<p>To stitch multiple images together, the following image processing algorithms are needed (Brown and Lowe 2007):<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
 <ol type="1">
-<li>ekstraksi ciri dengan <em>scale-invariant feature transform</em> (SIFT)</li>
-<li>estimasi homografi atau transformasi <em>affine</em> dengan <em>random sample consensus</em> (Ransac)</li>
-<li>optimisasi sambungan antar-citra dengan <em>bundle adjustment</em> dan <em>blending</em></li>
+<li>feature extraction with <em>scale-invariant feature transform</em> (SIFT)</li>
+<li>homography estimation or affine transformation with <em>random sample consensus</em> (RANSAC)</li>
+<li>optimization of stitching with <em>bundle adjustment</em> and <em>blending</em></li>
 </ol>
-<p>Salah satu implementasi algoritme ini adalah OpenPano yang ditulis oleh Wu (2019)<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
-<h2 id="kompilasi-openpano">Kompilasi OpenPano</h2>
-<p>Kode sumber OpenPano ditulis dengan bahasa C++ dari dasar. Sebelum bisa menjalankannya, kode sumber tersebut harus dikompilasi terlebih dahulu. Berikut perintah kompilasinya pada Ubuntu Linux 18.04.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># instal dependensi</span></a>
+<p>One implementation of these algorithms is OpenPano by Wu (2019)<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
+<h2 id="compiling-openpano">Compiling OpenPano</h2>
+<p>OpenPano source code was written using C++ from scratch without any computer vision library dependency. In order to run it, the source code must be compiled first. The following is the compilation command on Ubuntu Linux 18.04.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># install dependencies</span></a>
 <a class="sourceLine" id="cb1-2" title="2"><span class="fu">sudo</span> apt install cmake libeigen3-dev</a>
 <a class="sourceLine" id="cb1-3" title="3"></a>
-<a class="sourceLine" id="cb1-4" title="4"><span class="co"># unduh dan ekstrak</span></a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="co"># download and extract</span></a>
 <a class="sourceLine" id="cb1-5" title="5"><span class="fu">wget</span> https://github.com/ppwwyyxx/OpenPano/archive/master.zip</a>
 <a class="sourceLine" id="cb1-6" title="6"><span class="fu">unzip</span> master.zip</a>
 <a class="sourceLine" id="cb1-7" title="7"></a>
-<a class="sourceLine" id="cb1-8" title="8"><span class="co"># kompilasi</span></a>
+<a class="sourceLine" id="cb1-8" title="8"><span class="co"># compile</span></a>
 <a class="sourceLine" id="cb1-9" title="9"><span class="fu">make</span> -C OpenPano-master/src</a>
 <a class="sourceLine" id="cb1-10" title="10"></a>
-<a class="sourceLine" id="cb1-11" title="11"><span class="co"># salin hasilnya ke direktori /usr/local</span></a>
+<a class="sourceLine" id="cb1-11" title="11"><span class="co"># copy to /usr/local</span></a>
 <a class="sourceLine" id="cb1-12" title="12"><span class="fu">sudo</span> cp OpenPano-master/src/image-stitching /usr/local/bin</a>
 <a class="sourceLine" id="cb1-13" title="13"><span class="fu">sudo</span> cp OpenPano-master/src/config.cfg      /usr/local/etc</a></code></pre></div>
-<p>Setelah kompilasi berhasil, akan didapatkan program baru dengan nama <code>image-stitching</code>. <em>File</em> konfigurasi <code>config.cfg</code> harus disalin ke direktori kerja sebelum menjalankan program.</p>
-<h2 id="konfigurasi-openpano">Konfigurasi OpenPano</h2>
-<p>OpenPano memiliki pilihan tiga mode penyambungan dengan syaratnya:</p>
+<p>After successful compilation, there will be a new program named <code>image-stitching</code>. The configuration file <code>config.cfg</code> must be copied to the working directory before running this program.</p>
+<h2 id="configuring-openpano">Configuring OpenPano</h2>
+<p>OpenPano has three stitching modes, each has different requirement:</p>
 <ul>
-<li>silinder: tidak ada perpindahan pada kamera, citra diambil dari kiri ke kanan dan harus terurut</li>
-<li>estimasi: tidak ada perpindahan pada kamera, citra tidak terurut namun lebih lambat</li>
-<li>translasi: kamera hanya melakukan perpindahan dengan kedalaman citra sama, citra harus terurut</li>
+<li><em>cylinder</em>: no camera translation, the images are taken from left to right and must be ordered</li>
+<li><em>estimation</em>: no camera translation, the images could be unordered thus very slow</li>
+<li><em>translation</em>: pure camera translation at the same depth, must be ordered</li>
 </ul>
-<p>Mode <em>default</em> OpenPano adalah estimasi. Namun, untuk kasus penyambungan citra mikroskop, lebih tepat digunakan mode translasi. Hal ini karena citra mikroskop diambil dengan cara menggeser-geser objek. Berikut perubahan konfigurasi pada <em>file</em> <code>config.cfg</code> untuk beralih ke mode translasi.</p>
+<p>The default mode for OpenPano is estimation. But for stitching microscope images purpose, the most appropriate mode is translation. This is because the images are taken by sliding the object around while the camera is stationary. The following is the modified configuration file <code>config.cfg</code> in order to switch to translation mode.</p>
 <pre><code>CYLINDER            0
 ESTIMATE_CAMERA     0
 TRANS               1
 ORDERED_INPUT       1</code></pre>
-<h2 id="menjalankan-openpano">Menjalankan OpenPano</h2>
-<p>Syarat citra masukan:</p>
+<h2 id="running-openpano">Running OpenPano</h2>
+<p>In order to get a successful stitching, the input images must be:</p>
 <ul>
-<li>format PNG atau JPEG</li>
-<li>terurut secara bersambung (mengular)</li>
-<li>beririsan ciri minimal 10%</li>
+<li>PNG or JPEG format</li>
+<li>ordered sequentially in a snaky manner</li>
+<li>has feature overlap more than 10%</li>
 </ul>
-<p>Citra harus diberikan nama <em>file</em> yang menggambarkan urutannya. Berikut adalah contoh urutan citra yang benar.</p>
+<p>These images must be given filenames that represent their order. The following figure is an example of the proper ordering sequence.</p>
 <figure>
-<img src="order.png" alt="Urutan citra terurut secara mengular" /><figcaption>Urutan citra terurut secara mengular</figcaption>
+<img src="order.png" alt="The input images are ordered sequentially in a snaky manner" /><figcaption>The input images are ordered sequentially in a snaky manner</figcaption>
 </figure>
-<p>Sebelum menjalankan program, <em>file</em> konfigurasi <code>config.cfg</code> harus disalin dahulu ke direktori kerja. Kemudian, penyambungan citra dilakukan dengan memanggil program <code>image-stitching</code> dengan parameter semua nama citra yang akan disambung. Untuk dapat tersambung dengan baik, antara kedua citra harus beririsan ciri minimal 10%. Setelah berhasil, akan dihasilkan citra keluaran dengan nama <em>file</em> <code>out.jpg</code>.</p>
+<p>Before running the program, the <code>config.cfg</code> configuration file must be copied to the working directory. After that, the stitching is started by calling the <code>image-stitching</code> program with all of the images filename as parameter. To get successful stitching, between each image must have feature overlap of more than 10%. When finished successfully, there will be an output image with the filename of <code>out.jpg</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="fu">cp</span> /usr/local/etc/config.cfg .</a>
 <a class="sourceLine" id="cb3-2" title="2"><span class="ex">image-stitching</span> *.png</a></code></pre></div>
-<p>Berikut contoh citra masukan <em>Tilia1</em> yang terdiri atas 44 citra dan hasil keluarannya dengan menggunakan konfigurasi mode translasi. Tiap citra masukan berdimensi 1280×960 piksel. Citra keluaran berdimensi 5118×3879 piksel. Proses penyambungan citra mode translasi membutuhkan waktu CPU sebesar 1.4 menit pada prosesor Intel Core i7-4770 3.40 GHz.</p>
+<p>The following figure is an example of input set <em>Tilia1</em> that consists of 44 images and its output using translation mode. Every input image resolution is 1280×960 pixel and resulting in the output image resolution of 5118×3879 pixel. The image stitching process in translation mode consumes 1.4 minute of CPU time on an Intel Core i7-4770 processor.</p>
 <figure>
-<img src="input.jpg" alt="Citra masukan Tilia1 sebanyak 44 buah" /><figcaption>Citra masukan <em>Tilia1</em> sebanyak 44 buah</figcaption>
+<img src="input.jpg" alt="The Tilia1 input set of 44 images" /><figcaption>The <em>Tilia1</em> input set of 44 images</figcaption>
 </figure>
 <figure>
-<img src="est-tra.jpg" alt="Citra keluaran Tilia1 mode estimasi (kiri) dan translasi (kanan)" /><figcaption>Citra keluaran <em>Tilia1</em> mode estimasi (kiri) dan translasi (kanan)</figcaption>
+<img src="est-tra.jpg" alt="The Tilia1 output image using estimation (left) and translation (right) mode" /><figcaption>The <em>Tilia1</em> output image using estimation (left) and translation (right) mode</figcaption>
 </figure>
-<p>Percobaan pada mode estimasi memerlukan waktu CPU yang lebih lama sebesar 9.5 menit. Meskipun hasil sambungannya relatif lebih bagus, namun waktu yang sangat lama membuat mode estimasi tidak praktis untuk jumlah citra masukan yang banyak. Mode estimasi tidak mensyaratkan citra harus terurut, akibatnya kompleksitas menjadi kuadratik karena harus melakukan <em>pairwise matching</em> pada tiap citra masukan. Selain itu, mode estimasi akan mendistorsi citra hasil seperti bentuk lensa. Hal ini terlihat dari bentuk citra yang melengkung terutama pada bagian pinggir, sehingga tidak lurus lagi seperti yang diharapkan.</p>
-<h2 id="blending-vertikal"><em>Blending</em> Vertikal</h2>
-<p>Pada citra hasil mode translasi terlihat garis-garis mendatar pada sambungan antar-citra. Hal ini karena tujuan awal OpenPano adalah untuk menyambungkan citra panorama dari kiri ke kanan secara horizontal, bukan dari atas ke bawah. Oleh karena itu, diperlukan penambahan <em>blending</em> secara vertikal pada mode translasi dengan cara menghapus kode program baris ke-34 pada <em>file</em> <code>src/stitch/blender.cc</code> seperti di bawah ini. Setelah itu kode program OpenPano dikompilasi ulang.</p>
+<p>Another experiment using estimation mode needs more CPU time of 9.5 minutes. Although the stitching result is relatively better, but it is very slow that makes this mode impractical for a large amount of input images. This mode doesn’t require the input to be ordered, thus its complexity become quadratic because of pairwise matching for each images. Other than that, this mode will distort the result image like a lens form. This is evident at every corner of the result, it is not straight like the original object.</p>
+<h2 id="vertical-blending">Vertical Blending</h2>
+<p>In the result image of translation mode, there are horizontal lines visible at inter-image stitch. This happens because OpenPano main task is to stitch panoramic image from left to right horizontally, not from top to bottom. Because of that, vertical blending needs to be added to smooth out the result image in translation mode. It is done by deleting line 34 from the source code file <code>src/stitch/blender.cc</code> like the following. After that, the modified OpenPano source code must be recompiled.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode diff"><code class="sourceCode diff"><a class="sourceLine" id="cb4-1" title="1"><span class="dt">@@ -32,5 +32,4 @@</span></a>
 <a class="sourceLine" id="cb4-2" title="2">    if (color.x &lt; 0) continue; \</a>
 <a class="sourceLine" id="cb4-3" title="3">    float   w = 0.5 - fabs(c / img.imgref.width() - 0.5); \</a>
 <a class="sourceLine" id="cb4-4" title="4"><span class="st">-   if (not config::ORDERED_INPUT) /* blend both direction */\</span></a>
 <a class="sourceLine" id="cb4-5" title="5">        w *= (0.5 - fabs(r / img.imgref.height() - 0.5)); \</a>
 <a class="sourceLine" id="cb4-6" title="6">    color *= w</a></code></pre></div>
-<p>Berikut adalah hasil mode translasi dengan penambahan <em>blending</em> vertikal. Garis mendatar pada hasil sebelumnya sudah hilang, sehingga kualitasnya sama dengan mode estimasi. Waktu CPU yang dibutuhkan pun relatif sama dengan metode translasi biasa.</p>
+<p>The following figure is the result of translation mode with vertical blending. The horizontal lines has been disappeared, so the quality is as good as estimation mode without the undesired distortion. The CPU time is relatively the same as the ordinary translation mode.</p>
 <figure>
-<img src="out-trv.jpg" alt="Citra keluaran Tilia1 mode translasi dengan blending vertikal" /><figcaption>Citra keluaran <em>Tilia1</em> mode translasi dengan <em>blending</em> vertikal</figcaption>
+<img src="out-trv.jpg" alt="The Tilia1 output image using translation mode with vertical blending" /><figcaption>The <em>Tilia1</em> output image using translation mode with vertical blending</figcaption>
 </figure>
-<h2 id="kegagalan-penyambungan">Kegagalan Penyambungan</h2>
-<p>Pada contoh di atas, program berjalan dengan sukses karena semua citra berhasil disambungkan. Namun, pada banyak kasus terdapat citra yang gagal disambungkan dengan citra sebelumnya. Berikut contoh pesan kesalahan program jika menemukan kasus kegagalan tersebut.</p>
+<h2 id="stitching-error">Stitching Error</h2>
+<p>In the <em>Tilia1</em> example above, the program runs without error because every input images has been stitched successfully. But for many cases, usually there are images that failed to be stitched with previous image. The following is an example of the error message when the program failed to stitch image number 7 and 8.</p>
 <pre><code>error: Image 7 and 8 don&#39;t match</code></pre>
-<p>Sayangnya jika terjadi kegagalan, program akan langsung keluar tanpa melakukan langkah lebih lanjut. Citra yang gagal disambungkan biasanya memiliki fitur yang sedikit, sehingga tidak bisa disambungkan dengan citra berikutnya. Oleh karena itu, diperlukan metode tambahan untuk melanjutkan proses penyambungan jika terjadi kegagalan.</p>
-<p>Metode pertama sederhana, misalnya jika terdapat kegagalan penyambungan antara citra 7 dan 8, maka hapus citra nomor 8 dan jalankan kembali penyambungan dari awal. Demikian seterusnya sampai menyisakan kumpulan citra yang berhasil tersambung semuanya. Namun biasanya setelah citra 8 dihapus, citra 7 dan 9 akan gagal juga disambungkan, sehingga kegagalan akan berlanjut sampai akhir.</p>
-<p>Untuk mengatasinya, diperlukan metode baru dalam mengatasi kegagalan penyambungan. Metode kedua akan menghapus dengan mempertimbangkan nomor citra yang sudah dihapus sebelumnya. Misalnya citra 7 dan 8 gagal disambungkan, maka citra nomor 8 dihapus seperti biasa. Selanjutnya jika citra 7 dan 9 gagal disambungkan, maka citra nomor 7 yang akan dihapus, karena nomornya sama dengan nomor citra yang gagal sebelumnya. Dengan metode ini, jumlah citra yang dihapus menurun sehingga hasil akhirnya lebih bagus. Berikut ilustrasi proses kedua metode tersebut.</p>
+<p>Unfortunately when it failed, the program just exit immediately without doing further correction. The image that causing this failure is usually has too few features, so it can’t be stitched with the next image. So, additional step is needed to continue the stitching process when error happens.</p>
+<p>The first method is simple, for example when image 7 and 8 is failed, then delete image 8 and re-run the stitching program. This step is repeated until all of the remaining input images are successfully stitched together. But, after image 8 has been deleted, usually image 7 and 9 will be failed, and so onso this failure will continue until the last image.</p>
+<p>To address this problem, the second method will delete the failed image with regards to the last deleted image number. For example when image 7 and 8 is failed to stitch, then image 8 is deleted as usual. But then when image 7 and 9 is failed, then image 7 is deleted, because the number is the same as the image that caused the error before. Using this method, the number of failure is reduced, thus improving the result. The following is the illustration for both method.</p>
 <figure>
-<img src="method.gif" alt="Penghapusan citra yang gagal disambungkan dengan metode pertama (kiri) dan kedua (kanan)" /><figcaption>Penghapusan citra yang gagal disambungkan dengan metode pertama (kiri) dan kedua (kanan)</figcaption>
+<img src="method.gif" alt="Failed image deletion process using first (left) and second (right) method" /><figcaption>Failed image deletion process using first (left) and second (right) method</figcaption>
 </figure>
-<p>Perbandingan jumlah citra yang dihapus pada kedua metode dapat dilihat pada tabel berikut. Terdapat 5 set citra yang akan disambungkan, dapat dilihat bahwa metode kedua lebih baik dalam menangani kegagalan penyambungan. Contohnya dapat dilihat pada hasil penyambungan citra <em>Tilia5</em> berikut ini.</p>
+<p>The following table is the comparison of the number of image deleted between both methods. There are 5 set of input images that will be stitched. It is clear that the second method is better at handling the stitching error. For example, the following is the <em>Tilia5</em> stitching result using both methods.</p>
 <table>
-<caption>Perbandingan jumlah citra yang dihapus karena gagal disambung</caption>
+<caption>The number of image deleted because of stitching failure</caption>
 <thead>
 <tr class="header">
-<th style="text-align: left;">Citra</th>
-<th style="text-align: center;">Jumlah masukan</th>
-<th style="text-align: center;">Metode 1</th>
-<th style="text-align: center;">Metode 2</th>
+<th style="text-align: left;">Input set</th>
+<th style="text-align: center;">Total images</th>
+<th style="text-align: center;">Method 1</th>
+<th style="text-align: center;">Method 2</th>
 </tr>
 </thead>
 <tbody>
@@ -212,9 +212,9 @@ ORDERED_INPUT       1</code></pre>
 </tbody>
 </table>
 <figure>
-<img src="method-t5.jpg" alt="Citra keluaran Tilia5 dengan metode pertama (kiri) dan kedua (kanan)" /><figcaption>Citra keluaran <em>Tilia5</em> dengan metode pertama (kiri) dan kedua (kanan)</figcaption>
+<img src="method-t5.jpg" alt="The Tilia5 output image using first (left) and second (right) method" /><figcaption>The <em>Tilia5</em> output image using first (left) and second (right) method</figcaption>
 </figure>
-<p>Berikut adalah implementasi metode kedua dengan menggunakan <em>shell script</em>. Program <code>image-stitching</code> akan dijalankan terus menerus hingga tidak ada lagi pesan kesalahan.</p>
+<p>The following code is the implemetation of the second method using shell script. The <code>image-stitching</code> program runs repeatedly until there is no more error message, i.e. it stitched together all the remaining images successfully.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="fu">remove_unmatch ()</span> <span class="kw">{</span></a>
 <a class="sourceLine" id="cb6-2" title="2">    <span class="va">img_num=$(</span><span class="fu">grep</span> error err.log <span class="kw">|</span> <span class="fu">sed</span> -E <span class="st">&#39;s/.* ([0-9]+).*/\1/&#39;</span><span class="va">)</span>    <span class="co"># get unmatch image number</span></a>
 <a class="sourceLine" id="cb6-3" title="3"></a>
@@ -233,23 +233,23 @@ ORDERED_INPUT       1</code></pre>
 <a class="sourceLine" id="cb6-16" title="16"><span class="kw">until</span> <span class="ex">image-stitching</span> *.png <span class="op">2&gt;</span> err.log<span class="kw">;</span> <span class="kw">do</span></a>
 <a class="sourceLine" id="cb6-17" title="17">    <span class="ex">remove_unmatch</span></a>
 <a class="sourceLine" id="cb6-18" title="18"><span class="kw">done</span></a></code></pre></div>
-<h2 id="multiband-blending"><em>Multiband Blending</em></h2>
-<p>Meskipun berhasil disambungkan, namun detail citra yang dihasilkan masih ada yang samar di beberapa titik. Untuk memperoleh detail yang tajam, dapat digunakan fitur <em>multiband blending</em>. Fitur ini diaktifkan dengan mengatur konfigurasi <code>MULTIBAND</code> dengan nilai <em>band</em> yang diinginkan. Semakin besar jumlah <em>band</em>, semakin halus hasil sambungannya, namun akan menambah waktu CPU. Berikut contoh perbedaan detail antara mode translasi biasa dan mode translasi dengan 2-<em>band blending</em>.</p>
+<h2 id="multiband-blending">Multiband Blending</h2>
+<p>Although successfully stitched, the output image looks blurry on some spots. Multiband blending feature could be used to get sharper detail. This feature is activated by configuring the <code>MULTIBAND</code> line using the number of band desired. The more band number, the sharper the detail, but it will cost CPU time more. The following figure shows the difference between normal and 2-band blending translation mode.</p>
 <figure>
-<img src="detail.jpg" alt="Detail citra keluaran Tilia1 tanpa (kiri) dan dengan 2-band blending (kanan)" /><figcaption>Detail citra keluaran <em>Tilia1</em> tanpa (kiri) dan dengan 2-<em>band blending</em> (kanan)</figcaption>
+<img src="detail.jpg" alt="The Tilia1 output image detail without (left) dan with 2-band blending (right)" /><figcaption>The <em>Tilia1</em> output image detail without (left) dan with 2-band blending (right)</figcaption>
 </figure>
-<p>Namun, hasil akhir secara keseluruhan dengan fitur ini menjadi lebih buruk. Terlihat garis-garis pemisah antar-sambungan citra karena perbedaan kontras pada citra masukan. Garis-garis ini dapat disamarkan dengan menambah jumlah <em>band</em>, namun waktu pemrosesan menjadi lebih lama. Kualitas keluaran fitur ini akan lebih baik jika semua citra masukan memiliki pencahayaan atau kontras yang seragam. Berikut hasil citra keluaran secara keseluruhan dengan fitur <em>multiband blending</em> sejumlah 16 dan 128 <em>band</em>. Terlihat bahwa semakin banyak jumlah <em>band</em>, hasil keseluruhan semakin bagus.</p>
+<p>But, the overall result as a whole is worse by using this feature. There are many lines visible separating regions with different contrast level. These lines could be reduced by increasing the band number, but the processing time will be longer. The input images should have uniform lighting or contrast setting in order to get the best result. The following figure is the output image with multiband blending using 16-band and 128-band. The higher the band number, the better the overall result.</p>
 <figure>
-<img src="mband-16-128.jpg" alt="Citra keluaran Tilia1 dengan 16-band (kiri) dan 128-band (kanan) blending" /><figcaption>Citra keluaran <em>Tilia1</em> dengan 16-<em>band</em> (kiri) dan 128-<em>band</em> (kanan) <em>blending</em></figcaption>
+<img src="mband-16-128.jpg" alt="The Tilia1 output image using 16-band (left) and 128-band (right) blending" /><figcaption>The <em>Tilia1</em> output image using 16-band (left) and 128-band (right) blending</figcaption>
 </figure>
-<p>Tabel berikut menunjukkan waktu yang dibutuhkan untuk pemrosesan <em>multiband blending</em> dari 0 hingga 128 <em>band</em> untuk citra <em>Tilia1</em>. Dapat dilihat terjadi penambahan waktu CPU secara linear setiap penambahan jumlah <em>band</em>. Misalnya untuk 16-<em>band</em> dibutuhkan waktu CPU 3.7 menit atau waktu <em>real</em> 0.5 menit. Waktu <em>real</em> hampir 8 kali lebih cepat karena CPU Intel i7 yang digunakan memiliki 8 <em>thread</em>. Beban kerja CPU dibagi ke tiap <em>thread</em>, sehingga waktu <em>real</em>-nya lebih cepat. Untuk hasil yang bagus dengan 128-<em>band</em>, dibutuhkan waktu pemrosesan yang lama sekitar 30 menit waktu CPU.</p>
+<p>The following table shows the time for multiband blending processing from 0 to 128-band using <em>Tilia1</em> image. For every addition of band number, the processing time increase linearly. For example, 16-band blending needs 3.7 minutes CPU time or real time 0.5 minute. The real time is almost 8 times faster because the program is multithreaded using all 8 cores on Intel i7 processor. The processing load is divided to every thread, so the real time is faster. The 128-band blending yields the best result with reasonable processing time of 4 minutes in real time.</p>
 <table>
-<caption>Perbandingan waktu pemrosesan <em>multiband blending</em> citra <em>Tilia1</em></caption>
+<caption>Processing time comparison of multiband blending for <em>Tilia1</em></caption>
 <thead>
 <tr class="header">
-<th style="text-align: center;"><em>Band</em></th>
-<th style="text-align: center;">Waktu CPU</th>
-<th style="text-align: center;">Waktu <em>real</em></th>
+<th style="text-align: center;">Band</th>
+<th style="text-align: center;">CPU time</th>
+<th style="text-align: center;">Real time</th>
 </tr>
 </thead>
 <tbody>
@@ -300,10 +300,10 @@ ORDERED_INPUT       1</code></pre>
 </tr>
 </tbody>
 </table>
-<h2 id="simpulan">Simpulan</h2>
-<p>Mode translasi dengan tambahan <em>blending</em> vertikal pada OpenPano berhasil menyambungkan citra mikroskop dengan baik. Apabila terjadi kegagalan, maka citra yang menyebabkan gagal akan dihapus dengan mempertimbangkan kegagalan sebelumnya, hingga citra dapat disambungkan semuanya. Detail hasil citra keluaran dapat dipertajam dengan fitur <em>multiband blending</em>, namun hasil akhirnya menjadi terfragmentasi. Fragmentasi dapat disamarkan dengan menambah jumlah <em>band</em>, namun akan memperlama proses penyambungan. Sebaiknya semua citra masukan memiliki pencahayaan dan kontras yang seragam agar tidak terjadi fragmentasi.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>The translation mode with vertical blending addition on OpenPano has stitched the microscope images successfully. When error happens, the problematic image will be deleted with regards to previous error, until all images could be stitched. The result image detail looks blur in some spots. It could be sharpened by multiband blending, but the overall result looks fragmented. This fragmentation could be reduced by increasing the band number, although the processing time will be longer too. To get the best result possible, the input images must have uniform lighting and contrast.</p>
 <figure>
-<img src="out.gif" alt="Simpulan: estimasi, translasi, blending vertikal, dan multiband" /><figcaption>Simpulan: estimasi, translasi, <em>blending</em> vertikal, dan <em>multiband</em></figcaption>
+<img src="out.gif" alt="Conclusion: estimation, translation, vertical blending, and multiband blending" /><figcaption>Conclusion: estimation, translation, vertical blending, and multiband blending</figcaption>
 </figure>
 <!--
 
@@ -361,7 +361,7 @@ Intel i7-4770 4C/8T @ 3.40 GHz; SSD
 <hr />
 <ol>
 <li id="fn1" role="doc-endnote"><p>Brown M, Lowe DG. 2007. Automatic panoramic image stitching using invariant features. <em>IJCV</em>. 74(1): 59–73.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a></p></li>
-<li id="fn2" role="doc-endnote"><p>Wu Y. 2019. OpenPano: automatic panorama stitching from scratch. Tersedia pada: <a href="https://github.com/ppwwyyxx/OpenPano" class="uri">https://github.com/ppwwyyxx/OpenPano</a>.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩</a></p></li>
+<li id="fn2" role="doc-endnote"><p>Wu Y. 2019. OpenPano: automatic panorama stitching from scratch. Available at: <a href="https://github.com/ppwwyyxx/OpenPano" class="uri">https://github.com/ppwwyyxx/OpenPano</a>.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩</a></p></li>
 </ol>
 </section>
 </body>

@@ -91,13 +91,13 @@ cp /usr/local/etc/config.cfg .
 image-stitching *.png
 ```
 
-Berikut contoh citra masukan T1 yang terdiri atas 44 citra dan hasil keluarannya dengan menggunakan konfigurasi mode translasi.
+Berikut contoh citra masukan *Tilia1* yang terdiri atas 44 citra dan hasil keluarannya dengan menggunakan konfigurasi mode translasi.
 Tiap citra masukan berdimensi 1280×960 piksel. Citra keluaran berdimensi 5118×3879 piksel.
 Proses penyambungan citra mode translasi membutuhkan waktu CPU sebesar 1.4 menit pada prosesor Intel Core i7-4770 3.40 GHz.
 
-![Citra masukan T1 sebanyak 44 buah](input.jpg)
+![Citra masukan *Tilia1* sebanyak 44 buah](input.jpg)
 
-![Citra keluaran T1 mode estimasi (kiri) dan translasi (kanan)](est-tra.jpg)
+![Citra keluaran *Tilia1* mode estimasi (kiri) dan translasi (kanan)](est-tra.jpg)
 
 Percobaan pada mode estimasi memerlukan waktu CPU yang lebih lama sebesar 9.5 menit.
 Meskipun hasil sambungannya relatif lebih bagus, namun waktu yang sangat lama membuat mode estimasi tidak praktis untuk jumlah citra masukan yang banyak.
@@ -126,7 +126,7 @@ Berikut adalah hasil mode translasi dengan penambahan *blending* vertikal.
 Garis mendatar pada hasil sebelumnya sudah hilang, sehingga kualitasnya sama dengan mode estimasi.
 Waktu CPU yang dibutuhkan pun relatif sama dengan metode translasi biasa.
 
-![Citra keluaran T1 mode translasi dengan *blending* vertikal](out-trv.jpg)
+![Citra keluaran *Tilia1* mode translasi dengan *blending* vertikal](out-trv.jpg)
 
 
 ## Kegagalan Penyambungan
@@ -140,7 +140,7 @@ error: Image 7 and 8 don't match
 ```
 
 Sayangnya jika terjadi kegagalan, program akan langsung keluar tanpa melakukan langkah lebih lanjut.
-Citra yang dihapus biasanya memiliki fitur yang sedikit, sehingga tidak bisa disambungkan dengan citra berikutnya.
+Citra yang gagal disambungkan biasanya memiliki fitur yang sedikit, sehingga tidak bisa disambungkan dengan citra berikutnya.
 Oleh karena itu, diperlukan metode tambahan untuk melanjutkan proses penyambungan jika terjadi kegagalan.
 
 Metode pertama sederhana, misalnya jika terdapat kegagalan penyambungan antara citra 7 dan 8, maka hapus citra nomor 8 dan jalankan kembali penyambungan dari awal.
@@ -158,19 +158,19 @@ Berikut ilustrasi proses kedua metode tersebut.
 
 Perbandingan jumlah citra yang dihapus pada kedua metode dapat dilihat pada tabel berikut.
 Terdapat 5 set citra yang akan disambungkan, dapat dilihat bahwa metode kedua lebih baik dalam menangani kegagalan penyambungan.
-Contohnya dapat dilihat pada hasil penyambungan citra T5 berikut ini.
+Contohnya dapat dilihat pada hasil penyambungan citra *Tilia5* berikut ini.
 
 : Perbandingan jumlah citra yang dihapus karena gagal disambung
 
-| Citra | Jumlah masukan | Metode 1 | Metode 2 |
-| :---- | :------------: | :------: | :------: |
-| T1    |   44           |    0     |    0     |
-| T2    |   45           |    2     |    3     |
-| T3    |   42           |    6     |    2     |
-| T4    |   42           |    2     |    3     |
-| T5    |   48           |    13    |    4     |
+| Citra    | Jumlah masukan | Metode 1 | Metode 2 |
+| :------- | :------------: | :------: | :------: |
+| *Tilia1* |   44           |    0     |    0     |
+| *Tilia2* |   45           |    2     |    3     |
+| *Tilia3* |   42           |    6     |    2     |
+| *Tilia4* |   42           |    2     |    3     |
+| *Tilia5* |   48           |    13    |    4     |
 
-![Citra keluaran T5 dengan metode pertama (kiri) dan kedua (kanan)](method-t5.jpg)
+![Citra keluaran *Tilia5* dengan metode pertama (kiri) dan kedua (kanan)](method-t5.jpg)
 
 Berikut adalah implementasi metode kedua dengan menggunakan *shell script*.
 Program `image-stitching` akan dijalankan terus menerus hingga tidak ada lagi pesan kesalahan.
@@ -204,7 +204,7 @@ Fitur ini diaktifkan dengan mengatur konfigurasi `MULTIBAND` dengan nilai *band*
 Semakin besar jumlah *band*, semakin halus hasil sambungannya, namun akan menambah waktu CPU.
 Berikut contoh perbedaan detail antara mode translasi biasa dan mode translasi dengan 2-*band blending*.
 
-![Detail citra keluaran T1 tanpa (kiri) dan dengan 2-*band blending* (kanan)](detail.jpg)
+![Detail citra keluaran *Tilia1* tanpa (kiri) dan dengan 2-*band blending* (kanan)](detail.jpg)
 
 Namun, hasil akhir secara keseluruhan dengan fitur ini menjadi lebih buruk.
 Terlihat garis-garis pemisah antar-sambungan citra karena perbedaan kontras pada citra masukan.
@@ -213,16 +213,16 @@ Kualitas keluaran fitur ini akan lebih baik jika semua citra masukan memiliki pe
 Berikut hasil citra keluaran secara keseluruhan dengan fitur *multiband blending* sejumlah 16 dan 128 *band*.
 Terlihat bahwa semakin banyak jumlah *band*, hasil keseluruhan semakin bagus.
 
-![Citra keluaran T1 dengan 16-*band* (kiri) dan 128-*band* (kanan) *blending*](mband-16-128.jpg)
+![Citra keluaran *Tilia1* dengan 16-*band* (kiri) dan 128-*band* (kanan) *blending*](mband-16-128.jpg)
 
-Tabel berikut menunjukkan waktu yang dibutuhkan untuk pemrosesan *multiband blending* dari 0 hingga 128 *band* untuk citra T1.
+Tabel berikut menunjukkan waktu yang dibutuhkan untuk pemrosesan *multiband blending* dari 0 hingga 128 *band* untuk citra *Tilia1*.
 Dapat dilihat terjadi penambahan waktu CPU secara linear setiap penambahan jumlah *band*.
 Misalnya untuk 16-*band* dibutuhkan waktu CPU 3.7 menit atau waktu *real* 0.5 menit.
 Waktu *real* hampir 8 kali lebih cepat karena CPU Intel i7 yang digunakan memiliki 8 *thread*.
 Beban kerja CPU dibagi ke tiap *thread*, sehingga waktu *real*-nya lebih cepat.
 Untuk hasil yang bagus dengan 128-*band*, dibutuhkan waktu pemrosesan yang lama sekitar 30 menit waktu CPU.
 
-: Perbandingan waktu pemrosesan *multiband blending* citra T1
+: Perbandingan waktu pemrosesan *multiband blending* citra *Tilia1*
 
 | *Band* | Waktu CPU | Waktu *real* |
 | :----: | :-------: | :----------: |
